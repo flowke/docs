@@ -3,21 +3,15 @@ id: asynchronous
 title: Testing Asynchronous Code
 ---
 
-It's common in JavaScript for code to run asynchronously. When you have code
-that runs asynchronously, Jest needs to know when the code it is testing has
-completed, before it can move on to another test. Jest has several ways to
-handle this.
+运行异步代码的时候, Jest 需要知道所测试的代码什么时候完成, 这样才能进行下一条测试. Jest 有一些办法来处理这种情况.
 
-### Callbacks
+### 回调
 
-The most common asynchronous pattern is callbacks.
+通常的异步模式就是回调.
 
-For example, let's say that you have a `fetchData(callback)` function that
-fetches some data and calls `callback(data)` when it is complete. You want to
-test that this returned data is just the string `'peanut butter'`.
+例如, 你有个 `fetchData(callback)` 函数去请求数据, 完成的时候就会调用 `callback(data)`. 你想测试返回的数据是不是字符串:  `'peanut butter'`.
 
-By default, Jest tests complete once they reach the end of their execution. That
-means this test will _not_ work as intended:
+通常, 代码执行完成后 Jest 就完成测试, 如下测试不会成功:
 
 ```js
 // Don't do this!
@@ -30,12 +24,10 @@ test('the data is peanut butter', () => {
 });
 ```
 
-The problem is that the test will complete as soon as `fetchData` completes,
-before ever calling the callback.
+因为 `fetchData` 执行后就测试完成了. 等不到回调函数的执行.
 
-There is an alternate form of `test` that fixes this. Instead of putting the
-test in a function with an empty argument, use a single argument called `done`.
-Jest will wait until the `done` callback is called before finishing the test.
+ `test` 有个备用方法修正这种情况. 函数里添加一个 `done` 参数. `done` 执行之后才是测试完成.
+
 
 ```js
 test('the data is peanut butter', done => {
@@ -48,18 +40,13 @@ test('the data is peanut butter', done => {
 });
 ```
 
-If `done()` is never called, the test will fail, which is what you want to
-happen.
+如果 `done()` 永远都不会调用, 那么就是测试失败了. 这是我们期望的结果.
 
 ### Promises
 
-If your code uses promises, there is a simpler way to handle asynchronous tests.
-Just return a promise from your test, and Jest will wait for that promise to
-resolve. If the promise is rejected, the test will automatically fail.
+使用 Promise, 有一个简单的方式处理异步测试. 在 test 里面返回一个 Promise, Jest 就会等待 Promise resolve. 如果 Promise rejected, 测试就失败了.
 
-For example, let's say that `fetchData`, instead of using a callback, returns a
-promise that is supposed to resolve to the string `'peanut butter'`. We could
-test it with:
+例如下面代码:
 
 ```js
 test('the data is peanut butter', () => {
@@ -70,12 +57,10 @@ test('the data is peanut butter', () => {
 });
 ```
 
-Be sure to return the promise - if you omit this `return` statement, your test
-will complete before `fetchData` completes.
+千万记住把 promise return 出去.
 
-If you expect a promise to be rejected use the `.catch` method. Make sure to add
-`expect.assertions` to verify that a certain number of assertions are called.
-Otherwise a fulfilled promise would not fail the test.
+如果期望 promise rejected , 就用 `.catch` 方法. 确保添加
+`expect.assertions`. 不然, Promise fulfilled 后不会让这一次 test 失败.
 
 ```js
 test('the fetch fails with an error', () => {
@@ -88,9 +73,7 @@ test('the fetch fails with an error', () => {
 
 ##### available in Jest **20.0.0+**
 
-You can also use the `.resolves` matcher in your expect statement, and Jest will
-wait for that promise to resolve. If the promise is rejected, the test will
-automatically fail.
+你也可以在 expect 声明里使用 `.resolves` 匹配器, Jest 会等到 promise resolve. 如果 promise rejected, test 会失败.
 
 ```js
 test('the data is peanut butter', () => {
@@ -99,12 +82,7 @@ test('the data is peanut butter', () => {
 });
 ```
 
-Be sure to return the assertion—if you omit this `return` statement, your test
-will complete before `fetchData` completes.
-
-If you expect a promise to be rejected use the `.rejects` matcher. It works
-analogically to the `.resolves` matcher. If the promise is fulfilled, the test
-will automatically fail.
+同理, 以下是`.rejects` 匹配器.
 
 ```js
 test('the fetch fails with an error', () => {
@@ -115,9 +93,7 @@ test('the fetch fails with an error', () => {
 
 ### Async/Await
 
-Alternatively, you can use `async` and `await` in your tests. To write an async
-test, just use the `async` keyword in front of the function passed to `test`.
-For example, the same `fetchData` scenario can be tested with:
+在 test 也可以用 `async` 和 `await`:
 
 ```js
 test('the data is peanut butter', async () => {
@@ -136,7 +112,7 @@ test('the fetch fails with an error', async () => {
 });
 ```
 
-Of course, you can combine `async` and `await` with `.resolves` or `.rejects`
+当然, 你可以让 `async` 和 `await` 搭配 `.resolves` 或 `.rejects` 一起用.
 (available in Jest **20.0.0+**).
 
 ```js
@@ -151,9 +127,6 @@ test('the fetch fails with an error', async () => {
 });
 ```
 
-In these cases, `async` and `await` are effectively just syntactic sugar for the
-same logic as the promises example uses.
+这些例子了, `async` and `await` 这个语法糖非常高效.
 
-None of these forms is particularly superior to the others, and you can mix and
-match them across a codebase or even in a single file. It just depends on which
-style makes your tests simpler.
+以上各种测试异步的形式无所谓哪个好于不好. 这取决那种方式能够让你更简单的进行测试.

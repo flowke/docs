@@ -4,7 +4,7 @@ title: Using Matchers
 original_id: using-matchers
 ---
 
-Jest 使用 "matchers" 以不同方式来测试值.  这份文档会告诉你 matchers 通常的一些用法, 查看[`expect` API 文档](ExpectAPI.md).
+Jest 使用 "matchers" 以不同方式来测试值.  这份文档会告诉你匹配器通常的一些用法, 查看[`expect` API 文档](ExpectAPI.md).
 
 ### Common Matchers
 
@@ -16,13 +16,9 @@ test('two plus two is four', () => {
 });
 ```
 
-In this code, `expect(2 + 2)` returns an "expectation" object. You typically
-won't do much with these expectation objects except call matchers on them. In
-this code, `.toBe(4)` is the matcher. When Jest runs, it tracks all the failing
-matchers so that it can print out nice error messages for you.
+ `expect(2 + 2)` 返回了一个 "expectation" 对象. 通常你只是在这里调用匹配器, `.toBe(4)` 就是匹配器. 当 Jest 运行时, 它会跟踪所有失败的匹配器, 这样就可以为你打印错误信息.
 
-`toBe` uses `Object.is` to test exact equality. If you want to check the value
-of an object, use `toEqual` instead:
+`toBe` 使用 `Object.is` 来测试是不是绝对相等. 如果你想确认的是个对象, 那就用 `toEqual`:
 
 ```js
 test('object assignment', () => {
@@ -32,9 +28,9 @@ test('object assignment', () => {
 });
 ```
 
-`toEqual` recursively checks every field of an object or array.
+`toEqual` 会递归检查对象或数组的每一个字段:
 
-You can also test for the opposite of a matcher:
+你也可以测试一个匹配器的反面:
 
 ```js
 test('adding positive numbers is not zero', () => {
@@ -46,17 +42,17 @@ test('adding positive numbers is not zero', () => {
 });
 ```
 
-### Truthiness
+### 真值
 
-In tests you sometimes need to distinguish between `undefined`, `null`, and
-`false`, but you sometimes do not want to treat these differently. Jest contains
-helpers that let you be explicit about what you want.
+有时候你要区分 `undefined`, `null`, and
+`false`, 但又想同等对待. Jest 有一些
+helpers 帮助你.
 
-* `toBeNull` matches only `null`
-* `toBeUndefined` matches only `undefined`
-* `toBeDefined` is the opposite of `toBeUndefined`
-* `toBeTruthy` matches anything that an `if` statement treats as true
-* `toBeFalsy` matches anything that an `if` statement treats as false
+* `toBeNull` 只匹配 `null`
+* `toBeUndefined` 只匹配 `undefined`
+* `toBeDefined` 是 `toBeUndefined` 的对立面.
+* `toBeTruthy` 匹配任何 `if` 声明返回 true 的情况.
+* `toBeFalsy` 匹配任何 `if` 声明返回 false 的情况.
 
 For example:
 
@@ -80,12 +76,9 @@ test('zero', () => {
 });
 ```
 
-You should use the matcher that most precisely corresponds to what you want your
-code to be doing.
+### 数字
 
-### Numbers
-
-Most ways of comparing numbers have matcher equivalents.
+比较数字也有相应的匹配器.
 
 ```js
 test('two plus two', () => {
@@ -101,8 +94,7 @@ test('two plus two', () => {
 });
 ```
 
-For floating point equality, use `toBeCloseTo` instead of `toEqual`, because you
-don't want a test to depend on a tiny rounding error.
+对于浮点数, 用 `toBeCloseTo` 而不是 `toEqual`.
 
 ```js
 test('adding floating point numbers', () => {
@@ -112,9 +104,9 @@ test('adding floating point numbers', () => {
 });
 ```
 
-### Strings
+### 字符串
 
-You can check strings against regular expressions with `toMatch`:
+可以用 `toMatch` 来根据正则表达式检查字符串:
 
 ```js
 test('there is no I in team', () => {
@@ -126,9 +118,9 @@ test('but there is a "stop" in Christoph', () => {
 });
 ```
 
-### Arrays
+### 数组
 
-You can check if an array contains a particular item using `toContain`:
+可以使用 `toContain` 来检查数组是否包含某个元素:
 
 ```js
 const shoppingList = [
@@ -144,10 +136,9 @@ test('the shopping list has beer on it', () => {
 });
 ```
 
-### Exceptions
+### 异常
 
-If you want to test that a particular function throws an error when it's called,
-use `toThrow`.
+使用 `toThrow` 来检查 某个函数是否抛出了的异常.
 
 ```js
 function compileAndroidCode() {
@@ -166,8 +157,6 @@ test('compiling android goes as expected', () => {
 
 ### And More
 
-This is just a taste. For a complete list of matchers, check out the
-[reference docs](ExpectAPI.md).
+这只是一个小简介, 去文档看看: [reference docs](ExpectAPI.md).
 
-Once you've learned about the matchers that are available, a good next step is
-to check out how Jest lets you [test asynchronous code](TestingAsyncCode.md).
+了解匹配器之后, 就可以看看 [测试异步代码](TestingAsyncCode.md).

@@ -4,20 +4,13 @@ title: Mock Functions
 original_id: mock-functions
 ---
 
-Mock functions make it easy to test the links between code by erasing the actual
-implementation of a function, capturing calls to the function (and the
-parameters passed in those calls), capturing instances of constructor functions
-when instantiated with `new`, and allowing test-time configuration of return
-values.
+模拟函数通过擦除函数的实际实现，捕获对函数的调用（以及在这些调用中传递的参数 )，实例化对象时捕获实例, 允许返回值的测试时间配置, 很容易的就测试代码之间的关系.
 
-There are two ways to mock functions: Either by creating a mock function to use
-in test code, or writing a [`manual mock`](ManualMocks.md) to override a module
-dependency.
+有两种办法模拟函数: 在 test 代码里面创建个模拟函数 或 写一个 [`手动模拟`](ManualMocks.md) 来覆盖模块依赖.
 
-## Using a mock function
+## 使用一个模拟函数
 
-Let's imagine we're testing an implementation of a function `forEach`, which
-invokes a callback for each item in a supplied array.
+下面有个 `forEach`函数:
 
 ```javascript
 function forEach(items, callback) {
@@ -30,29 +23,28 @@ function forEach(items, callback) {
 To test this function, we can use a mock function, and inspect the mock's state
 to ensure the callback is invoked as expected.
 
+要测试这个函数, 我们可以使用一个模拟函数, 并观察模拟的状态来保证回调函数如期运行:
+
 ```javascript
 const mockCallback = jest.fn();
 forEach([0, 1], mockCallback);
 
-// The mock function is called twice
+// 模拟函数会调用两次
 expect(mockCallback.mock.calls.length).toBe(2);
 
-// The first argument of the first call to the function was 0
+// 第一次调用函数时, 第一个参数是 0
 expect(mockCallback.mock.calls[0][0]).toBe(0);
 
-// The first argument of the second call to the function was 1
+// 第二次调用函数时, 第一个参数是 0
 expect(mockCallback.mock.calls[1][0]).toBe(1);
 
-// The return value of the first call to the function was 42
+// 第一次调用时, 返回的结果是 42
 expect(mockCallback.mock.returnValues[0]).toBe(42);
 ```
 
-## `.mock` property
+## `.mock` 属性
 
-All mock functions have this special `.mock` property, which is where data about
-how the function has been called and what the function returned is kept. The
-`.mock` property also tracks the value of `this` for each call, so it is
-possible to inspect this as well:
+所有的模拟函数都有个特别的 `.mock` 属性, 里面有函数调用的数据, 函数返回的值. `.mock` 属性同样跟踪每次执行时 `this` 的值, 所以检查如下代码也同样可以:
 
 ```javascript
 const myMock = jest.fn();
@@ -66,34 +58,31 @@ console.log(myMock.mock.instances);
 // > [ <a>, <b> ]
 ```
 
-These mock members are very useful in tests to assert how these functions get
-called, instantiated, or what they returned:
+这些模拟成员会非常有用:
 
 ```javascript
-// The function was called exactly once
+// 函数只被执行一次
 expect(someMockFunction.mock.calls.length).toBe(1);
 
-// The first arg of the first call to the function was 'first arg'
+// 第一次调用的时第一个参数是: 'first arg'
 expect(someMockFunction.mock.calls[0][0]).toBe('first arg');
 
-// The second arg of the first call to the function was 'second arg'
+// 第一次调用的时第二个参数是: 'second arg'
 expect(someMockFunction.mock.calls[0][1]).toBe('second arg');
 
-// The return value of the first call to the function was 'return value'
+// 第一次调用的返回值: 'return value'
 expect(someMockFunction.mock.returnValues[0]).toBe('return value');
 
-// This function was instantiated exactly twice
+// 被实例化了两次
 expect(someMockFunction.mock.instances.length).toBe(2);
 
-// The object returned by the first instantiation of this function
-// had a `name` property whose value was set to 'test'
+// 第一次实例化的实例, 有一个 name 属性, 值是: 'test'
 expect(someMockFunction.mock.instances[0].name).toEqual('test');
 ```
 
-## Mock Return Values
+## 模拟返回值
 
-Mock functions can also be used to inject test values into your code during a
-test:
+可以插入一些返回值:
 
 ```javascript
 const myMock = jest.fn();
@@ -109,17 +98,13 @@ console.log(myMock(), myMock(), myMock(), myMock());
 // > 10, 'x', true, true
 ```
 
-Mock functions are also very effective in code that uses a functional
-continuation-passing style. Code written in this style helps avoid the need for
-complicated stubs that recreate behavior of the real component they're standing
-in for, in favor of injecting values directly into the test right before they're
-used.
+比如如下使用场景:
 
 ```javascript
 const filterTestFn = jest.fn();
 
-// Make the mock return `true` for the first call,
-// and `false` for the second call
+// 第一次执行返回 true
+// 第二次执行返回 false
 filterTestFn.mockReturnValueOnce(true).mockReturnValueOnce(false);
 
 const result = [11, 12].filter(filterTestFn);
@@ -135,11 +120,9 @@ dependent component and configuring that, but the technique is the same. In
 these cases, try to avoid the temptation to implement logic inside of any
 function that's not directly being tested.
 
-## Mocking Modules
+## 模拟模块
 
-Suppose we have a class that fetches users from our API. The class uses
-[axios](https://github.com/axios/axios) to call the API then returns the `data`
-attribute which contains all the users:
+假设有个类, 里面有个 [axios](https://github.com/axios/axios) 请求:
 
 ```js
 // users.js
@@ -154,13 +137,7 @@ class Users {
 export default Users;
 ```
 
-Now, in order to test this method without actually hitting the API (and thus
-creating slow and fragile tests), we can use the `jest.mock(...)` function to
-automatically mock the axios module.
-
-Once we mock the module we can provide a `mockReturnValue` for `.get` that
-returns the data we want our test to assert against. In effect, we are saying
-that we want axios.get('/users.json') to return a fake response.
+我们可以使用 `jest.mock(...)` 来模拟 axios 模块.
 
 ```js
 // users.test.js
@@ -171,6 +148,7 @@ jest.mock('axios');
 
 test('should fetch users', () => {
   const resp = {data: [{name: 'Bob'}]};
+  // 相当于设置模拟请求后返回的数据
   axios.get.mockResolvedValue(resp);
 
   // or you could use the following depending on your use case:
